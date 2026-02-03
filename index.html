@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>عجلة الحظ - Syrian Technology</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+<img src="logo.png" class="logo">
+
+<h1>🎯 عجلة الحظ</h1>
+
+<div class="wheel-container">
+<div class="pointer">▼</div>
+<canvas id="wheel" width="300" height="300"></canvas>
+</div>
+
+<button onclick="spin()">لف العجلة</button>
+<h2 id="result"></h2>
+</div>
+
+<audio id="spinSound" src="spin.mp3"></audio>
+<audio id="winSound" src="win.mp3"></audio>
+
+<script src="script.js"></script>
+</body>
+</html>
