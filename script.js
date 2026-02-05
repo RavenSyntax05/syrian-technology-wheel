@@ -4,17 +4,17 @@ const spinSound = document.getElementById("spinSound");
 const winSound = document.getElementById("winSound");
 
 const prizes = [
-  { text: "حظ أوفر", chance: 65, color: "#b0bec5" },
-  { text: "ستاند مراوح", chance: 11, color: "#42a5f5" },
-  { text: "ساعة ذكية", chance: 11, color: "#66bb6a" },
-  { text: "كيبورد مضيئ", chance: 11, color: "#ffca28" },
-  { text: "لابتوب ميني", chance: 2, color: "#ef5350" }
+  { text: "حظ أوفر", chance: 65, win: false, color: "#cfd8dc" },
+  { text: "ستاند مراوح", chance: 11, win: true, color: "#42a5f5" },
+  { text: "ساعة ذكية", chance: 11, win: true, color: "#66bb6a" },
+  { text: "كيبورد مضيئ", chance: 11, win: true, color: "#ffca28" },
+  { text: "لابتوب ميني", chance: 2, win: true, color: "#ef5350" }
 ];
 
 const sliceAngle = (2 * Math.PI) / prizes.length;
 let currentRotation = 0;
 
-/* رسم العجلة بخانات متساوية */
+/* رسم العجلة (خانات متساوية) */
 function drawWheel() {
   prizes.forEach((p, i) => {
     const start = i * sliceAngle;
@@ -39,13 +39,26 @@ function drawWheel() {
 
 drawWheel();
 
-/* اختيار الفوز حسب النِسَب فقط */
+/* اختيار دقيق حسب النِّسَب */
 function weightedPick() {
   const r = Math.random() * 100;
   let sum = 0;
   for (let p of prizes) {
     sum += p.chance;
-    if (r <= sum) return p;
+    if (r < sum) return p;
+  }
+}
+
+/* احتفال */
+function confetti() {
+  for (let i = 0; i < 120; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.backgroundColor =
+      ["#f44336", "#4caf50", "#2196f3", "#ffeb3b"][Math.floor(Math.random() * 4)];
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
   }
 }
 
@@ -53,25 +66,45 @@ function weightedPick() {
 function spin() {
   spinSound.play();
 
-  const win = weightedPick();
-  const index = prizes.indexOf(win);
+  const result = weightedPick();
+  const index = prizes.indexOf(result);
 
   const spins = 5;
-  const targetAngle =
-    360 * spins +
+  const angle =
+    spins * 360 +
     (360 - (index * 360 / prizes.length + 360 / prizes.length / 2));
 
-  currentRotation += targetAngle;
-
+  currentRotation += angle;
   canvas.style.transition = "transform 4s ease-out";
   canvas.style.transform = `rotate(${currentRotation}deg)`;
 
   setTimeout(() => {
     spinSound.pause();
     spinSound.currentTime = 0;
-    winSound.play();
 
-    document.getElementById("result").innerHTML =
-      `🎉 مبروك!<br>ربحت: <b>${win.text}</b> 🎊`;
+    if (result.win) {
+      winSound.play();
+      confetti();
+      document.getElementById("result").innerHTML =
+        `🎉 مبروك!<br>ربحت: <b>${result.text}</b> 🎊`;
+    } else {
+      document.getElementById("result").innerHTML =
+        `😢 حظ أوفر المرة القادمة`;
+    }
   }, 4000);
 }
+
+/* CSS للاحتفال */
+const style = document.createElement("style");
+style.innerHTML = `
+.confetti {
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 10px;
+  animation: fall 3s linear;
+}
+@keyframes fall {
+  to { transform: translateY(110vh) rotate(360deg); }
+}`;
+document.head.appendChild(style);
